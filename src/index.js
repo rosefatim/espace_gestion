@@ -3,18 +3,14 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Composant from './Composant';
 import Stack from "@mui/material/Stack";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode > 
-    <Stack direction="row" spacing={2}  justifyContent="space-evenly"  alignItems="center">
+    <Stack >
       <App />
-      <Stack>
-        <Composant />
-      </Stack>
     </Stack>
   </React.StrictMode>
 );
