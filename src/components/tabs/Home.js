@@ -11,16 +11,15 @@ import {
   FormGroup,
   AppBar,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 // import HomeIcon from "@mui/icons-material/Home";
-import { Link } from "react-router-dom";
-
-
-
+import { Link, Navigate } from "react-router-dom";
+import { sessionGet } from "../functions/sessionGet";
+import { sessionDelete } from "../functions/sessionDel";
 
 class App extends Component {
   state = {
@@ -28,19 +27,18 @@ class App extends Component {
     toDelete: [],
     jour: "",
     todo: "",
-    alert: false,
+    alert: false
   };
-
 
   handleChange = (e) => {
     e.preventDefault();
     return this.setState({
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   pushElement = () => {
-    const { data, jour, todo } = this.state; 
+    const { data, jour, todo } = this.state;
     if (jour.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
@@ -50,11 +48,11 @@ class App extends Component {
         {
           id: data.length + 1,
           jour: jour,
-          todo: todo,
-        },
+          todo: todo
+        }
       ],
       jour: "",
-      todo: "",
+      todo: ""
     });
   };
   deleteElement = () => {
@@ -64,12 +62,12 @@ class App extends Component {
     });
     return this.setState({
       data: newData,
-      toDelete: [],
+      toDelete: []
     });
   };
   closeAlert = () => {
     return this.setState({
-      alert: false,
+      alert: false
     });
   };
 
@@ -77,22 +75,29 @@ class App extends Component {
     const { toDelete } = this.state;
     if (toDelete.includes(id) === true) {
       return this.setState({
-        toDelete: toDelete.filter((item) => item !== id),
+        toDelete: toDelete.filter((item) => item !== id)
       });
     }
     return this.setState({
-      toDelete: [...toDelete, id],
+      toDelete: [...toDelete, id]
     });
   };
 
   render() {
     const { data, jour, todo, alert, toDelete } = this.state;
+
+    if (!sessionGet("auth_token") || sessionGet("auth_token").length === 0) {
+      return <Navigate to="/" />;
+    }
+
     return (
       <div>
-        
-       {/* Header */}
-        <Box sx={{ flexGrow: 1}}>
-          <AppBar position="static" style={{paddingLeft:25,paddingRight:25}}>
+        {/* Header */}
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar
+            position="static"
+            style={{ paddingLeft: 25, paddingRight: 25 }}
+          >
             <Toolbar>
               <Typography component="div" sx={{ flexGrow: 1 }}>
                 LOGO
@@ -101,10 +106,16 @@ class App extends Component {
                 {/* <Button color="inherit" startIcon={<HomeIcon />} style={{marginRight:20}}>
                   Home
                 </Button> */}
-                <Link to="/login" style={{textDecoration:"none" , color:"white"}}>
-                <Button color="inherit" startIcon={<AccountCircle />}>
-                    Logout                 
-                </Button>
+                <Link
+                  to="/"
+                  style={{ textDecoration: "none", color: "white" }}
+                  onClick={() => {
+                    return sessionDelete("auth_token");
+                  }}
+                >
+                  <Button color="inherit" startIcon={<AccountCircle />}>
+                    Logout
+                  </Button>
                 </Link>
               </Stack>
             </Toolbar>
