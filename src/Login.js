@@ -16,7 +16,6 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
-import { Link } from "react-router-dom";
 
 class Login extends Component {
   // states
@@ -68,6 +67,7 @@ class Login extends Component {
             backgroundColor: "#CECECE",
             marginLeft: "35%",
             marginTop: "5%",
+            paddingLeft: 3,
           }}
         >
           <Typography
@@ -102,10 +102,7 @@ class Login extends Component {
                   variant="outlined"
                   style={{ width: "90%" }}
                   type={this.state.visibility ? "text" : "password"}
-                  
                 />
-        
-
                 <IconButton
                   aria-label="visibily"
                   style={{ width: 30 }}
@@ -124,21 +121,20 @@ class Login extends Component {
                 <FormGroup>
                   <FormControlLabel control={<Checkbox />} label="Remember me" />
                 </FormGroup>
-                {/* <Link to="/home" style={{ textDecoration: "none", color: "white" }} > */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  style={{ marginTop: 5, marginLeft:"23%"}}
-                  onClick={() => {
-                    this.connected();
-                  }}
-                >
-                  Connect
-                </Button>
-                {/* </Link> */}
+                <Button href="#text-buttons" style={{marginLeft:"5%"}}>Forgot password?</Button>
               </Stack>
-
-              <Button href="#text-buttons">Forgot password?</Button>
+              {/* <Link to="/home" style={{ textDecoration: "none", color: "white" }} > */}
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ marginTop: 5 }}
+                onClick={() => {
+                  this.connected();
+                }}
+              >
+                Connect
+              </Button>
+              {/* </Link> */}
             </Stack>
           </CardContent>
         </Card>

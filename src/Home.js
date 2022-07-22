@@ -114,7 +114,7 @@ class App extends Component {
         {/* Alert */}
         <Snackbar
           open={alert}
-          autoHideDuration={6000}
+          // autoHideDuration={6000}
           onClose={() => this.closeAlert()}
         >
           <Alert
