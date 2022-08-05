@@ -5,14 +5,16 @@ const DisplayButton = (props) => {
   return (
     <Button
       variant={props.type}
+      color={props.color}
       style={{
         ...props.style
       }}
+      disabled={props.disabled}
+      startIcon={props.startIcon}
       onClick={() => {
         // alert("clicked");
         props.onPress();
       }}
-      disabled={props.disabled}
     >
       <p
         style={{

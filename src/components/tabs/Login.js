@@ -1,32 +1,29 @@
 import React, { Component } from "react";
 import {
-  Button,
   Stack,
   TextField,
   Card,
   CardContent,
   Typography,
   Snackbar,
-  Alert,
-  FormGroup,
-  FormControlLabel,
-  Checkbox
+  Alert
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
 import { DisplayButton } from "../librairy/button";
-import { regexVerifier } from "../functions/regex";
+// import { regexVerifier } from "../functions/regex";
 import { validatorConnect } from "../functions/validator-connect";
 import { sessionAdd } from "../functions/sessionAdd";
 import { keyCredential } from "../constants/credential";
-import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
+// import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
 import { sessionGet } from "../functions/sessionGet";
 import { Navigate } from "react-router-dom";
 // import { Redirect } from "react-router-dom";
 
 class Login extends Component {
+
   // states
   state = {
     email: "",
@@ -123,6 +120,7 @@ class Login extends Component {
           >
             Sign In
           </Typography>
+
           <CardContent>
             <AccountCircle
               style={{
@@ -166,28 +164,13 @@ class Login extends Component {
                 </IconButton>
               </Stack>
 
-              {/* <Link to="/home" style={{ textDecoration: "none", color: "white" }} > */}
-              {/* <Button
-                variant="contained"
-                color="primary"
-                style={{ marginTop: 5 }}
-                onClick={() => {
-                  this.connected();
-                }}
-              >
-                Connect
-              </Button> */}
-
               <DisplayButton
                 type="contained"
                 disabled={false}
                 text={"Connect"}
                 onPress={() => this.handleConnect()}
-                style={{}}
-                textStyle={{}}
+                style={{ width: "90%" ,height: 50}}                
               />
-
-              {/* </Link> */}
             </Stack>
           </CardContent>
         </Card>

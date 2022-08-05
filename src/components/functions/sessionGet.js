@@ -1,5 +1,8 @@
+import  secureLocalStorage  from  "react-secure-storage";
+
 const sessionGet = (key) => {
-  return sessionStorage.getItem(key);
+          // sessionStorage || localStorage
+  return secureLocalStorage.getItem(key);
 };
 
 export { sessionGet };

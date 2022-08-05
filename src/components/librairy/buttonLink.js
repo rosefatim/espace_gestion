@@ -14,6 +14,7 @@ const DisplayLink = (props) => {
           props.onPress();
         }}
         disabled={props.disabled}
+        startIcon={props.startIcon}
       >
         <p
           style={{

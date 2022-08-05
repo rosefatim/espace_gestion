@@ -1,5 +1,8 @@
+import  secureLocalStorage  from  "react-secure-storage";
+
 const sessionDelete = (key) => {
-  return sessionStorage.removeItem(key);
+            // sessionStorage||localStorage
+  return secureLocalStorage.removeItem(key);
 };
 
 export { sessionDelete };

@@ -4,22 +4,22 @@ import {
   Checkbox,
   FormControlLabel,
   TextField,
-  Button,
   Box,
   Snackbar,
   Alert,
   FormGroup,
   AppBar,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-// import HomeIcon from "@mui/icons-material/Home";
-import { Link, Navigate } from "react-router-dom";
+import {  Navigate } from "react-router-dom";
 import { sessionGet } from "../functions/sessionGet";
 import { sessionDelete } from "../functions/sessionDel";
+import { DisplayLink } from "../librairy/buttonLink";
+import { DisplayButton } from "../librairy/button";
 
 class App extends Component {
   state = {
@@ -27,13 +27,13 @@ class App extends Component {
     toDelete: [],
     jour: "",
     todo: "",
-    alert: false
+    alert: false,
   };
 
   handleChange = (e) => {
     e.preventDefault();
     return this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -48,11 +48,11 @@ class App extends Component {
         {
           id: data.length + 1,
           jour: jour,
-          todo: todo
-        }
+          todo: todo,
+        },
       ],
       jour: "",
-      todo: ""
+      todo: "",
     });
   };
   deleteElement = () => {
@@ -62,12 +62,12 @@ class App extends Component {
     });
     return this.setState({
       data: newData,
-      toDelete: []
+      toDelete: [],
     });
   };
   closeAlert = () => {
     return this.setState({
-      alert: false
+      alert: false,
     });
   };
 
@@ -75,11 +75,11 @@ class App extends Component {
     const { toDelete } = this.state;
     if (toDelete.includes(id) === true) {
       return this.setState({
-        toDelete: toDelete.filter((item) => item !== id)
+        toDelete: toDelete.filter((item) => item !== id),
       });
     }
     return this.setState({
-      toDelete: [...toDelete, id]
+      toDelete: [...toDelete, id],
     });
   };
 
@@ -103,20 +103,23 @@ class App extends Component {
                 LOGO
               </Typography>
               <Stack direction="row " justifyContent="space-evently">
-                {/* <Button color="inherit" startIcon={<HomeIcon />} style={{marginRight:20}}>
-                  Home
-                </Button> */}
-                <Link
+                <DisplayLink
+                  to="error"
+                  style={{ textDecoration: "none", color: "white" , marginRight: 5}}
+                  disabled={false}
+                  text="Contact Us"
+                />
+                <DisplayLink
                   to="/"
-                  style={{ textDecoration: "none", color: "white" }}
-                  onClick={() => {
+                  style={{ textDecoration: "none", color: "white"  }}
+                  disabled={false}
+                  text="Logout"
+                  onPress={() => {
                     return sessionDelete("auth_token");
                   }}
-                >
-                  <Button color="inherit" startIcon={<AccountCircle />}>
-                    Logout
-                  </Button>
-                </Link>
+                  textStyle={{ textDecoration: "none" }}
+                  startIcon={<AccountCircle />}
+                />
               </Stack>
             </Toolbar>
           </AppBar>
@@ -138,6 +141,7 @@ class App extends Component {
             Remplissez les champs
           </Alert>
         </Snackbar>
+        
 
         {/* Main */}
         <Stack
@@ -186,7 +190,27 @@ class App extends Component {
               />
             </Stack>
             <Stack direction="row" spacing={2} style={{ marginLeft: "25%" }}>
-              <Button
+              <DisplayButton
+                type="contained"
+                text="Add"
+                color="primary"
+                startIcon={<AddIcon />}
+                style={{height: 50}}
+                onPress={()=>{
+                  this.pushElement();
+                }}
+              />
+              <DisplayButton
+                type="contained"
+                text="Delete"
+                color="error"
+                startIcon={<DeleteIcon />}
+                style={{height: 50}}
+                onPress={()=>{
+                  this.deleteElement();
+                }}
+              />
+              {/* <Button
                 variant="contained"
                 color="primary"
                 startIcon={<AddIcon />}
@@ -195,8 +219,8 @@ class App extends Component {
                 }}
               >
                 Add
-              </Button>
-              <Button
+              </Button> */}
+              {/* <Button
                 variant="contained"
                 color="error"
                 startIcon={<DeleteIcon />}
@@ -205,7 +229,7 @@ class App extends Component {
                 }}
               >
                 Delete
-              </Button>
+              </Button> */}
             </Stack>
           </Box>
         </Stack>
