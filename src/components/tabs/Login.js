@@ -19,11 +19,12 @@ import IconButton from "@mui/material/IconButton";
 import { DisplayButton } from "../librairy/button";
 import { regexVerifier } from "../functions/regex";
 import { validatorConnect } from "../functions/validator-connect";
-import { sessionAdd } from "../functions/sessionAdd";
 import { keyCredential } from "../constants/credential";
 import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
-import { sessionGet } from "../functions/sessionGet";
 import { Navigate } from "react-router-dom";
+import { sessionHandler } from "../functions/sessionStore";
+import { connect } from "react-redux";
+import { addUserData } from "../../store/actions";
 // import { Redirect } from "react-router-dom";
 
 class Login extends Component {
@@ -63,6 +64,7 @@ class Login extends Component {
     //   });
     // }
     console.log(email, password);
+
     if (!validatorConnect(email, password)) {
       return this.setState({
         alert: true,
@@ -70,8 +72,11 @@ class Login extends Component {
         alertText: "Email ou Mot de passe incorrect"
       });
     }
-
-    await sessionAdd("auth_token", keyCredential);
+    await this.props.saveData({
+      email: email,
+      password: password
+    });
+    await sessionHandler("auth_token", keyCredential, "set");
     this.setState({
       alert: true,
       alertType: "success",
@@ -84,7 +89,10 @@ class Login extends Component {
   render() {
     const { alert, alertText, alertType, email, password } = this.state;
 
-    if (sessionGet("auth_token") && sessionGet("auth_token").length !== 0) {
+    if (
+      sessionHandler("auth_token", null, "get") &&
+      sessionHandler("auth_token", null, "get").length !== 0
+    ) {
       return <Navigate to="/home" />;
     }
 
@@ -186,7 +194,6 @@ class Login extends Component {
                 style={{}}
                 textStyle={{}}
               />
-
               {/* </Link> */}
             </Stack>
           </CardContent>
@@ -196,4 +203,16 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const mapStateToProps = (state) => {
+  return {};
+};
+
+const mapDispatchStoreToProps = (dispatch) => {
+  return {
+    saveData: (data) => {
+      dispatch(addUserData(data));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchStoreToProps)(Login);

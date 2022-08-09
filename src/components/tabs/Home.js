@@ -18,10 +18,11 @@ import AddIcon from "@mui/icons-material/Add";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 // import HomeIcon from "@mui/icons-material/Home";
 import { Link, Navigate } from "react-router-dom";
-import { sessionGet } from "../functions/sessionGet";
-import { sessionDelete } from "../functions/sessionDel";
+import { sessionHandler } from "../functions/sessionStore";
+import { removeUserData, todoData } from "../../store/actions";
+import { connect } from "react-redux";
 
-class App extends Component {
+class Home extends Component {
   state = {
     data: [],
     toDelete: [],
@@ -42,7 +43,7 @@ class App extends Component {
     if (jour.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
-    return this.setState({
+    this.setState({
       data: [
         ...data,
         {
@@ -54,16 +55,25 @@ class App extends Component {
       jour: "",
       todo: ""
     });
+    return this.props.manageData([
+      ...data,
+      {
+        id: data.length + 1,
+        jour: jour,
+        todo: todo
+      }
+    ]);
   };
   deleteElement = () => {
     const { data, toDelete } = this.state;
     const newData = data.filter((item) => {
       return toDelete.includes(item.id) === false;
     });
-    return this.setState({
+    this.setState({
       data: newData,
       toDelete: []
     });
+    return this.props.manageData(newData);
   };
   closeAlert = () => {
     return this.setState({
@@ -86,7 +96,10 @@ class App extends Component {
   render() {
     const { data, jour, todo, alert, toDelete } = this.state;
 
-    if (!sessionGet("auth_token") || sessionGet("auth_token").length === 0) {
+    if (
+      !sessionHandler("auth_token", null, "get") ||
+      sessionHandler("auth_token", null, "get").length === 0
+    ) {
       return <Navigate to="/" />;
     }
 
@@ -109,8 +122,9 @@ class App extends Component {
                 <Link
                   to="/"
                   style={{ textDecoration: "none", color: "white" }}
-                  onClick={() => {
-                    return sessionDelete("auth_token");
+                  onClick={async () => {
+                    await this.props.deleteData();
+                    return sessionHandler("auth_token", null, "remove");
                   }}
                 >
                   <Button color="inherit" startIcon={<AccountCircle />}>
@@ -148,7 +162,7 @@ class App extends Component {
         >
           <Box sx={{ width: "40%", border: "1px solid black", padding: 5 }}>
             <h1>My TodoList</h1>
-            {data?.map((item) => (
+            {this.props.todo?.map((item) => (
               <FormGroup key={item.id}>
                 <FormControlLabel
                   value="end"
@@ -209,11 +223,29 @@ class App extends Component {
             </Stack>
           </Box>
         </Stack>
-
+        {/* {JSON.stringify(this.props.user)} */}
         {/* Footer */}
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+    todo: state.todo
+  };
+};
+
+const mapDispatchStoreToProps = (dispatch) => {
+  return {
+    deleteData: () => {
+      dispatch(removeUserData());
+    },
+    manageData: (data) => {
+      dispatch(todoData(data));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchStoreToProps)(Home);
