@@ -15,8 +15,6 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-<<<<<<< HEAD
-
 import { DisplayLink } from "../librairy/buttonLink";
 import { DisplayButton } from "../librairy/button";
 import {  Navigate } from "react-router-dom";
@@ -24,14 +22,7 @@ import { sessionHandler } from "../functions/sessionStore";
 import { removeUserData, todoData } from "../../store/actions";
 import { connect } from "react-redux";
 
-=======
-// import HomeIcon from "@mui/icons-material/Home";
-import { Link, Navigate } from "react-router-dom";
-import { sessionHandler } from "../functions/sessionStore";
-import { removeUserData, todoData } from "../../store/actions";
-import { connect } from "react-redux";
 
->>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
 class Home extends Component {
   state = {
     data: [],
@@ -53,11 +44,7 @@ class Home extends Component {
     if (jour.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
-<<<<<<< HEAD
    this.setState({
-=======
-    this.setState({
->>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
       data: [
         ...data,
         {
@@ -139,15 +126,10 @@ class Home extends Component {
                 />
                 <DisplayLink
                   to="/"
-<<<<<<< HEAD
                   style={{ textDecoration: "none", color: "white"  }}
                   disabled={false}
                   text="Logout"
                   onPress={async () => {
-=======
-                  style={{ textDecoration: "none", color: "white" }}
-                  onClick={async () => {
->>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
                     await this.props.deleteData();
                     return sessionHandler("auth_token", null, "remove");
                   }}
@@ -275,7 +257,3 @@ const mapDispatchStoreToProps = (dispatch) => {
 };
 
 export default connect(mapStateToProps, mapDispatchStoreToProps)(Home);
-<<<<<<< HEAD
-
-=======
->>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
