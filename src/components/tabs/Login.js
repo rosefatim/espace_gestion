@@ -15,6 +15,7 @@ import IconButton from "@mui/material/IconButton";
 import { DisplayButton } from "../librairy/button";
 // import { regexVerifier } from "../functions/regex";
 import { validatorConnect } from "../functions/validator-connect";
+<<<<<<< HEAD
 
 import { keyCredential } from "../constants/credential";
 // import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
@@ -22,6 +23,15 @@ import { sessionHandler } from "../functions/sessionStore";
 import { connect } from "react-redux";
 import { addUserData } from "../../store/actions";
 import { Navigate } from "react-router-dom";
+=======
+import { keyCredential } from "../constants/credential";
+import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
+import { Navigate } from "react-router-dom";
+import { sessionHandler } from "../functions/sessionStore";
+import { connect } from "react-redux";
+import { addUserData } from "../../store/actions";
+// import { Redirect } from "react-router-dom";
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
 
 class Login extends Component {
 
@@ -61,6 +71,7 @@ class Login extends Component {
     //   });
     // }
     console.log(email, password);
+
     if (!validatorConnect(email, password)) {
       return this.setState({
         alert: true,
@@ -178,6 +189,10 @@ class Login extends Component {
                 onPress={() => this.handleConnect()}
                 style={{ width: "90%" ,height: 50}}                
               />
+<<<<<<< HEAD
+=======
+              {/* </Link> */}
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
             </Stack>
           </CardContent>
         </Card>

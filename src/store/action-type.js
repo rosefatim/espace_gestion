@@ -3,4 +3,8 @@ const LOGOUT_USER = "LOGOUT_USER";
 
 const TODO_DATA = "TODO_DATA";
 
+<<<<<<< HEAD
 export { LOGIN_USER, LOGOUT_USER, TODO_DATA};
+=======
+export { LOGIN_USER, LOGOUT_USER, TODO_DATA };
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682

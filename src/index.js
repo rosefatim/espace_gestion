@@ -1,7 +1,10 @@
 
 import React from "react";
 import ReactDOM from "react-dom/client";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
@@ -12,6 +15,12 @@ import { Provider } from "react-redux";
 import rootReducer from "./store/reducer";
 import secureLocalStorage from "react-secure-storage";
 
+<<<<<<< HEAD
+=======
+// import * as serviceWorker from "./serviceWorker";
+
+// require('dotenv').config()
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
 
 function saveToLocalStorage(state) {
   try {

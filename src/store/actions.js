@@ -14,5 +14,8 @@ const todoData = (data) => ({
   data: data
 });
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2c0118a4d258f32e0a871655d0443b38b99ba682
 export { addUserData, removeUserData, todoData };
