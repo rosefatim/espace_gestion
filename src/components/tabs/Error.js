@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import Lottie from "react-lottie";
 import * as animationData from "../../assets/lotties/404.json";
-import { Typography, Stack } from "@mui/material";
 
 
 
