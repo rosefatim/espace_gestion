@@ -10,7 +10,7 @@ import {
   FormGroup,
   AppBar,
   Toolbar,
-  Typography,
+  Typography
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,28 +21,40 @@ import { Navigate } from "react-router-dom";
 import { sessionHandler } from "../functions/sessionStore";
 import { removeUserData, todoData } from "../../store/actions";
 import { connect } from "react-redux";
-import axios from "axios";
-import { createTodoUrl } from "../constants/credential";
+import Axios from "axios";
+import {
+  base_url,
+  createTodoUrl,
+  deleteTodo,
+  getAllTodo
+} from "../constants/url";
+
+import CircularProgress from "@mui/material/CircularProgress";
 
 class Home extends Component {
   state = {
     data: [],
     toDelete: [],
-    jour: "",
+    day: "",
     todo: "",
     alert: false,
+    load: true
   };
+
+  componentDidMount() {
+    this.getAllTodos();
+  }
 
   handleChange = (e) => {
     e.preventDefault();
     return this.setState({
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
   pushElement = () => {
-    const { data, jour, todo } = this.state;
-    if (jour.length === 0 || todo.length === 0) {
+    const { data, day, todo } = this.state;
+    if (day.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
     this.setState({
@@ -50,20 +62,20 @@ class Home extends Component {
         ...data,
         {
           id: data.length + 1,
-          jour: jour,
-          todo: todo,
-        },
+          day: day,
+          todo: todo
+        }
       ],
-      jour: "",
-      todo: "",
+      day: "",
+      todo: ""
     });
     return this.props.manageData([
       ...data,
       {
         id: data.length + 1,
-        jour: jour,
-        todo: todo,
-      },
+        day: day,
+        todo: todo
+      }
     ]);
   };
   deleteElement = () => {
@@ -73,45 +85,106 @@ class Home extends Component {
     });
     this.setState({
       data: newData,
-      toDelete: [],
+      toDelete: []
     });
     return this.props.manageData(newData);
   };
   closeAlert = () => {
     return this.setState({
-      alert: false,
+      alert: false
     });
   };
 
-  checkDelete = (id) => {
-    const { toDelete } = this.state;
-    if (toDelete.includes(id) === true) {
+  checkDelete = async (id) => {
+    const { data } = this.state;
+    this.setState({
+      load: true
+    });
+    console.log("hey");
+    if (
+      data.find((item) => {
+        return item._id === id;
+      }) !== undefined
+    ) {
+      console.log("hey 2");
+
+      setTimeout(async () => {
+        await Axios.delete(base_url + deleteTodo + id)
+          .then((res) => {
+            console.log(res.data);
+            return this.setState({
+              toDelete: [...this.state.toDelete, id],
+              data: data.filter((item) => item._id !== id),
+              load: false
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            // notifier a l'utilisateur que ca a echouer
+            this.setState({
+              load: false
+            });
+          });
+      }, 2500);
+    }
+  };
+
+  createTodo = async () => {
+    const { day, todo } = this.state;
+    this.setState({
+      load: true
+    });
+
+    if (day.length === 0 || todo.length === 0) {
+      console.log("Not upload because of length");
       return this.setState({
-        toDelete: toDelete.filter((item) => item !== id),
+        load: false
       });
     }
-    return this.setState({
-      toDelete: [...toDelete, id],
-    });
-  };
 
-  createTodo = () => {
-    axios
-      .post(createTodoUrl, {
-        title: "Hello World!",
-        description: "This is a new post.",
-        user_id : "638637fe3bcbd09abf98a1f7"
+    setTimeout(async () => {
+      await Axios.post(base_url + createTodoUrl, {
+        title: day,
+        description: todo,
+        user_id: "638637fe3bcbd09abf98a1f7"
       })
-      .then(response => console.log('Success: ', response))
-      .catch(error => console.log('Error: ', error));
-
+        .then((response) => {
+          console.log("Success: ", response?.data?.message);
+          this.setState({
+            load: false,
+            data: [response?.data?.data, ...this.state.data]
+          });
+        })
+        .catch((error) => {
+          console.log("Error: ", error?.response?.data?.message);
+          // ajouter notification ici
+          this.setState({
+            load: false
+          });
+        });
+    }, 2000);
   };
 
- 
-
+  getAllTodos = async () => {
+    await Axios.get(base_url + getAllTodo)
+      .then((res) => {
+        console.log(res?.data);
+        this.setState({
+          load: false,
+          data: res?.data?.data
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        //notification d'erreur
+        this.setState({
+          load: false
+        });
+      });
+  };
 
   render() {
-    const { jour, todo, alert, toDelete } = this.state;
+    const { day, todo, alert, toDelete, data, load } = this.state;
 
     if (
       !sessionHandler("auth_token", null, "get") ||
@@ -138,7 +211,7 @@ class Home extends Component {
                   style={{
                     textDecoration: "none",
                     color: "white",
-                    marginRight: 5,
+                    marginRight: 5
                   }}
                   disabled={false}
                   text="Contact Us"
@@ -186,31 +259,39 @@ class Home extends Component {
         >
           <Box sx={{ width: "40%", border: "1px solid black", padding: 5 }}>
             <h1>My TodoList</h1>
-            {this.props.todo?.map((item) => (
-              <FormGroup key={item.id}>
-                <FormControlLabel
-                  value="end"
-                  control={
-                    <Checkbox
-                      checked={toDelete.includes(item.id)}
-                      onChange={() => {
-                        this.checkDelete(item.id);
-                      }}
+            {load ? (
+              <CircularProgress />
+            ) : (
+              data
+                ?.filter((res) => {
+                  return !res?.achieved;
+                })
+                .map((item) => (
+                  <FormGroup key={item._id}>
+                    <FormControlLabel
+                      value="end"
+                      control={
+                        <Checkbox
+                          checked={toDelete.includes(item._id)}
+                          onChange={() => {
+                            this.checkDelete(item._id);
+                          }}
+                        />
+                      }
+                      label={item.title + " : " + item.description}
                     />
-                  }
-                  label={item.jour + " : " + item.todo}
-                />
-              </FormGroup>
-            ))}
+                  </FormGroup>
+                ))
+            )}
           </Box>
           <Box sx={{ width: "30%" }} component="form">
             <h1>Add a Todo</h1>
             <Stack direction="row" padding={2} spacing={2}>
               <TextField
                 id="outlined-basic"
-                label="jour"
-                name="jour"
-                value={jour}
+                label="day"
+                name="day"
+                value={day}
                 variant="outlined"
                 onChange={(e) => this.handleChange(e)}
               />
@@ -223,31 +304,37 @@ class Home extends Component {
                 onChange={(e) => this.handleChange(e)}
               />
             </Stack>
-            <Stack direction="row" spacing={2} style={{ marginLeft: "25%" }}>
-              <DisplayButton
-                type="contained"
-                text="Add"
-                color="primary"
-                startIcon={<AddIcon />}
-                style={{ height: 50 }}
-                onPress={() => {
-                  this.createTodo();
-                }}
-              />
-              <DisplayButton
-                type="contained"
-                text="Delete"
-                color="error"
-                startIcon={<DeleteIcon />}
-                style={{ height: 50 }}
-                onPress={() => {
-                  this.deleteElement();
-                }}
-              />
-            </Stack>
+            {load ? (
+              <Box>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Stack direction="row" spacing={2} style={{ marginLeft: "25%" }}>
+                <DisplayButton
+                  type="contained"
+                  text="Add"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  style={{ height: 50 }}
+                  onPress={() => {
+                    this.createTodo();
+                  }}
+                />
+                <DisplayButton
+                  type="contained"
+                  text="Delete"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  style={{ height: 50 }}
+                  onPress={() => {
+                    this.deleteElement();
+                  }}
+                />
+              </Stack>
+            )}
           </Box>
         </Stack>
-        {/* {JSON.stringify(this.props.user)} */}
+        {/* {JSON.stringify(this.state.data)} */}
         {/* Footer */}
       </div>
     );
@@ -257,7 +344,7 @@ class Home extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    todo: state.todo,
+    todo: state.todo
   };
 };
 
@@ -268,7 +355,7 @@ const mapDispatchStoreToProps = (dispatch) => {
     },
     manageData: (data) => {
       dispatch(todoData(data));
-    },
+    }
   };
 };
 
