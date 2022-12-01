@@ -17,11 +17,12 @@ import AddIcon from "@mui/icons-material/Add";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { DisplayLink } from "../librairy/buttonLink";
 import { DisplayButton } from "../librairy/button";
-import {  Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { sessionHandler } from "../functions/sessionStore";
 import { removeUserData, todoData } from "../../store/actions";
 import { connect } from "react-redux";
-
+import axios from "axios";
+import { createTodoUrl } from "../constants/credential";
 
 class Home extends Component {
   state = {
@@ -44,7 +45,7 @@ class Home extends Component {
     if (jour.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
-   this.setState({
+    this.setState({
       data: [
         ...data,
         {
@@ -61,8 +62,8 @@ class Home extends Component {
       {
         id: data.length + 1,
         jour: jour,
-        todo: todo
-      }
+        todo: todo,
+      },
     ]);
   };
   deleteElement = () => {
@@ -94,8 +95,23 @@ class Home extends Component {
     });
   };
 
+  createTodo = () => {
+    axios
+      .post(createTodoUrl, {
+        title: "Hello World!",
+        description: "This is a new post.",
+        user_id : "638637fe3bcbd09abf98a1f7"
+      })
+      .then(response => console.log('Success: ', response))
+      .catch(error => console.log('Error: ', error));
+
+  };
+
+ 
+
+
   render() {
-    const {jour, todo, alert, toDelete } = this.state;
+    const { jour, todo, alert, toDelete } = this.state;
 
     if (
       !sessionHandler("auth_token", null, "get") ||
@@ -119,14 +135,17 @@ class Home extends Component {
               <Stack direction="row " justifyContent="space-evently">
                 <DisplayLink
                   to="error"
-                  style={{ textDecoration: "none", color: "white" , marginRight: 5}}
+                  style={{
+                    textDecoration: "none",
+                    color: "white",
+                    marginRight: 5,
+                  }}
                   disabled={false}
                   text="Contact Us"
-                 
                 />
                 <DisplayLink
                   to="/"
-                  style={{ textDecoration: "none", color: "white"  }}
+                  style={{ textDecoration: "none", color: "white" }}
                   disabled={false}
                   text="Logout"
                   onPress={async () => {
@@ -157,7 +176,6 @@ class Home extends Component {
             Remplissez les champs
           </Alert>
         </Snackbar>
-        
 
         {/* Main */}
         <Stack
@@ -211,9 +229,9 @@ class Home extends Component {
                 text="Add"
                 color="primary"
                 startIcon={<AddIcon />}
-                style={{height: 50}}
-                onPress={()=>{
-                  this.pushElement();
+                style={{ height: 50 }}
+                onPress={() => {
+                  this.createTodo();
                 }}
               />
               <DisplayButton
@@ -221,14 +239,12 @@ class Home extends Component {
                 text="Delete"
                 color="error"
                 startIcon={<DeleteIcon />}
-                style={{height: 50}}
-                onPress={()=>{
+                style={{ height: 50 }}
+                onPress={() => {
                   this.deleteElement();
                 }}
               />
-              
             </Stack>
-
           </Box>
         </Stack>
         {/* {JSON.stringify(this.props.user)} */}
@@ -241,7 +257,7 @@ class Home extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    todo: state.todo
+    todo: state.todo,
   };
 };
 
@@ -252,7 +268,7 @@ const mapDispatchStoreToProps = (dispatch) => {
     },
     manageData: (data) => {
       dispatch(todoData(data));
-    }
+    },
   };
 };
 

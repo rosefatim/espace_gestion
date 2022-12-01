@@ -23,6 +23,8 @@ import { sessionHandler } from "../functions/sessionStore";
 import { connect } from "react-redux";
 import { addUserData } from "../../store/actions";
 import { Navigate } from "react-router-dom";
+import axios from "axios"
+import { createUser } from "../constants/credential";
 
 
 class Login extends Component {
@@ -44,49 +46,81 @@ class Login extends Component {
     });
   };
 
-  handleConnect = async () => {
-    const { email, password } = this.state;
-    // if (!regexVerifier(EMAIL_CODE, email)) {
-    //   return this.setState({
-    //     alert: true,
-    //     alertType: "error",
-    //     alertText: "Entrez un email valide"
-    //   });
-    // }
+  // handleConnect = async () => {
+  //   const { email, password } = this.state;
+  //   // if (!regexVerifier(EMAIL_CODE, email)) {
+  //   //   return this.setState({
+  //   //     alert: true,
+  //   //     alertType: "error",
+  //   //     alertText: "Entrez un email valide"
+  //   //   });
+  //   // }
 
-    // if (!regexVerifier(PASSWORD_CODE, password)) {
-    //   return this.setState({
-    //     alert: true,
-    //     alertType: "error",
-    //     alertText:
-    //       "Votre password doit contenir une lettre majuscule, un nombre, un caractère spécial et un minimum de 8 caractères"
-    //   });
-    // }
-    console.log(email, password);
+  //   // if (!regexVerifier(PASSWORD_CODE, password)) {
+  //   //   return this.setState({
+  //   //     alert: true,
+  //   //     alertType: "error",
+  //   //     alertText:
+  //   //       "Votre password doit contenir une lettre majuscule, un nombre, un caractère spécial et un minimum de 8 caractères"
+  //   //   });
+  //   // }
+  //   console.log(email, password);
 
-    if (!validatorConnect(email, password)) {
-      return this.setState({
-        alert: true,
-        alertType: "error",
-        alertText: "Email ou Mot de passe incorrect"
-      });
-    }
-    await this.props.saveData({
-      email: email,
-      password: password
-    });
-    await sessionHandler("auth_token", keyCredential, "set");
-    this.setState({
-      alert: true,
-      alertType: "success",
-      alertText: "Vous êtes connecté"
-    });
+  //   if (!validatorConnect(email, password)) {
+  //     return this.setState({
+  //       alert: true,
+  //       alertType: "error",
+  //       alertText: "Email ou Mot de passe incorrect"
+  //     });
+  //   }
+  //   await this.props.saveData({
+  //     email: email,
+  //     password: password
+  //   });
+  //   await sessionHandler("auth_token", keyCredential, "set");
+  //   this.setState({
+  //     alert: true,
+  //     alertType: "success",
+  //     alertText: "Vous êtes connecté"
+  //   });
 
-    // return this.props.history.push("/home");
+  //   // return this.props.history.push("/home");
+  // };
+
+
+  loginfunction = async (email, password) => {
+  
+    const postData = { "email": email, "password": password };
+    const apiURL = createUser ;
+    
+    await axios({
+      method: 'post',
+      url: apiURL,
+      data: postData,
+    })
+      .then(response => console.log('Success: ', response))
+      .catch(error => console.log('Error: ', error));
+
+      console.log(email, password);
+  }
+
+ 
+  createTodo = () => {
+    axios
+      .post(createUser, {
+        firtname: "Hello World!",
+        lastname: "This is a new post.",
+        email : "638637fe3bcbd09abf98a1f7",
+        password : ""
+      })
+      .then(response => console.log('Success: ', response))
+      .catch(error => console.log('Error: ', error));
+
   };
 
+
   render() {
-    const { alert, alertText, alertType, email, password } = this.state;
+    const { alert, alertText, alertType} = this.state;
 
     if (
       sessionHandler("auth_token", null, "get") &&
@@ -178,7 +212,7 @@ class Login extends Component {
                 type="contained"
                 disabled={false}
                 text={"Connect"}
-                onPress={() => this.handleConnect()}
+                onPress={() => this.handleConnect("email", "password")}
                 style={{ width: "90%" ,height: 50}}                
               />
 
