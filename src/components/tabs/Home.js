@@ -10,10 +10,11 @@ import {
   FormGroup,
   AppBar,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { DisplayLink } from "../librairy/buttonLink";
 import { DisplayButton } from "../librairy/button";
@@ -24,21 +25,22 @@ import { connect } from "react-redux";
 import Axios from "axios";
 import {
   base_url,
-  createTodoUrl,
+  createTodo,
   deleteTodo,
-  getAllTodo
+  getAllTodo,
+  updateTodo,
 } from "../constants/url";
-
 import CircularProgress from "@mui/material/CircularProgress";
+import OpenAlert from "../librairy/openAlert";
 
 class Home extends Component {
   state = {
     data: [],
     toDelete: [],
-    day: "",
+    title: "",
     todo: "",
     alert: false,
-    load: true
+    load: true,
   };
 
   componentDidMount() {
@@ -48,13 +50,13 @@ class Home extends Component {
   handleChange = (e) => {
     e.preventDefault();
     return this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   pushElement = () => {
-    const { data, day, todo } = this.state;
-    if (day.length === 0 || todo.length === 0) {
+    const { data, title, todo } = this.state;
+    if (title.length === 0 || todo.length === 0) {
       return this.setState({ alert: true });
     }
     this.setState({
@@ -62,22 +64,23 @@ class Home extends Component {
         ...data,
         {
           id: data.length + 1,
-          day: day,
-          todo: todo
-        }
+          title: title,
+          todo: todo,
+        },
       ],
-      day: "",
-      todo: ""
+      title: "",
+      todo: "",
     });
     return this.props.manageData([
       ...data,
       {
         id: data.length + 1,
-        day: day,
-        todo: todo
-      }
+        title: title,
+        todo: todo,
+      },
     ]);
   };
+
   deleteElement = () => {
     const { data, toDelete } = this.state;
     const newData = data.filter((item) => {
@@ -85,84 +88,89 @@ class Home extends Component {
     });
     this.setState({
       data: newData,
-      toDelete: []
+      toDelete: [],
     });
     return this.props.manageData(newData);
   };
+
   closeAlert = () => {
     return this.setState({
-      alert: false
+      alert: false,
     });
   };
 
   checkDelete = async (id) => {
     const { data } = this.state;
+
     this.setState({
-      load: true
+      load: true,
     });
-    console.log("hey");
+
     if (
       data.find((item) => {
         return item._id === id;
       }) !== undefined
     ) {
-      console.log("hey 2");
-
       setTimeout(async () => {
         await Axios.delete(base_url + deleteTodo + id)
           .then((res) => {
             console.log(res.data);
+            //delete avec succes
             return this.setState({
               toDelete: [...this.state.toDelete, id],
               data: data.filter((item) => item._id !== id),
-              load: false
+              load: false,
             });
           })
           .catch((err) => {
             console.log(err);
             // notifier a l'utilisateur que ca a echouer
             this.setState({
-              load: false
+              load: false,
             });
           });
-      }, 2500);
+      }, 1000);
     }
   };
 
   createTodo = async () => {
-    const { day, todo } = this.state;
+    const { title, todo } = this.state;
+
     this.setState({
-      load: true
+      load: true,
     });
 
-    if (day.length === 0 || todo.length === 0) {
+    if (title.length === 0 || todo.length === 0) {
       console.log("Not upload because of length");
+     
       return this.setState({
-        load: false
+        load: false,
       });
     }
-
     setTimeout(async () => {
-      await Axios.post(base_url + createTodoUrl, {
-        title: day,
+      await Axios.post(base_url + createTodo, {
+        title: title,
         description: todo,
-        user_id: "638637fe3bcbd09abf98a1f7"
+        user_id: "638637fe3bcbd09abf98a1f7",
       })
         .then((response) => {
           console.log("Success: ", response?.data?.message);
           this.setState({
             load: false,
-            data: [response?.data?.data, ...this.state.data]
+            data: [response?.data?.data, ...this.state.data],
+            title: "",
+            todo: "",
           });
+         
         })
         .catch((error) => {
           console.log("Error: ", error?.response?.data?.message);
-          // ajouter notification ici
+          OpenAlert()
           this.setState({
-            load: false
+            load: false,
           });
         });
-    }, 2000);
+    }, 1000);
   };
 
   getAllTodos = async () => {
@@ -171,20 +179,58 @@ class Home extends Component {
         console.log(res?.data);
         this.setState({
           load: false,
-          data: res?.data?.data
+          data: res?.data?.data,
         });
       })
       .catch((err) => {
         console.log(err);
         //notification d'erreur
         this.setState({
-          load: false
+          load: false,
         });
       });
   };
 
+  updateTodo = async (id) => {
+    const { title, todo } = this.state;
+
+    this.setState({
+      load: true,
+    });
+
+    if (title.length === 0 || todo.length === 0) {
+      console.log("Not upload because of length");
+      return this.setState({
+        load: false,
+      });
+    }
+    setTimeout(async () => {
+      await Axios.post(base_url + updateTodo + id, {
+        title: title,
+        description: todo,
+        user_id: "638637fe3bcbd09abf98a1f7",
+      })
+        .then((response) => {
+          console.log("Success: ", response?.data?.message);
+          this.setState({
+            load: false,
+            data: [response?.data?.data, ...this.state.data],
+          });
+        })
+        .catch((error) => {
+          console.log("Error: ", error?.response?.data?.message);
+          // ajouter notification ici
+          this.setState({
+            load: false,
+          });
+        });
+    }, 1000);
+  };
+
+
+
   render() {
-    const { day, todo, alert, toDelete, data, load } = this.state;
+    const { title, todo, alert, toDelete, data, load } = this.state;
 
     if (
       !sessionHandler("auth_token", null, "get") ||
@@ -211,7 +257,7 @@ class Home extends Component {
                   style={{
                     textDecoration: "none",
                     color: "white",
-                    marginRight: 5
+                    marginRight: 5,
                   }}
                   disabled={false}
                   text="Contact Us"
@@ -249,6 +295,7 @@ class Home extends Component {
             Remplissez les champs
           </Alert>
         </Snackbar>
+     
 
         {/* Main */}
         <Stack
@@ -284,20 +331,22 @@ class Home extends Component {
                 ))
             )}
           </Box>
+
+          {/* right*/}
           <Box sx={{ width: "30%" }} component="form">
             <h1>Add a Todo</h1>
             <Stack direction="row" padding={2} spacing={2}>
               <TextField
                 id="outlined-basic"
-                label="day"
-                name="day"
-                value={day}
+                label="Title"
+                name="title"
+                value={title}
                 variant="outlined"
                 onChange={(e) => this.handleChange(e)}
               />
               <TextField
                 id="outlined-basic"
-                label="todo"
+                label="Description"
                 name="todo"
                 value={todo}
                 variant="outlined"
@@ -309,7 +358,7 @@ class Home extends Component {
                 <CircularProgress />
               </Box>
             ) : (
-              <Stack direction="row" spacing={2} style={{ marginLeft: "25%" }}>
+              <Stack direction="row" spacing={2} style={{ marginLeft: "10%" }}>
                 <DisplayButton
                   type="contained"
                   text="Add"
@@ -330,6 +379,16 @@ class Home extends Component {
                     this.deleteElement();
                   }}
                 />
+                <DisplayButton
+                  type="contained"
+                  text="Edit"
+                  color="success"
+                  startIcon={<EditIcon />}
+                  style={{ height: 50 }}
+                  onPress={() => {
+                    this.updateTodo();
+                  }}
+                />
               </Stack>
             )}
           </Box>
@@ -344,7 +403,7 @@ class Home extends Component {
 const mapStateToProps = (state) => {
   return {
     user: state.user,
-    todo: state.todo
+    todo: state.todo,
   };
 };
 
@@ -355,7 +414,7 @@ const mapDispatchStoreToProps = (dispatch) => {
     },
     manageData: (data) => {
       dispatch(todoData(data));
-    }
+    },
   };
 };
 

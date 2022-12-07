@@ -24,7 +24,7 @@ import { connect } from "react-redux";
 import { addUserData } from "../../store/actions";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
-import { createUser, base_url } from "../constants/url";
+import { createUser, base_url, getUser } from "../constants/url";
 
 class Login extends Component {
   // states
@@ -85,7 +85,7 @@ class Login extends Component {
     // return this.props.history.push("/home");
   };
 
-  loginfunction = async (email, password) => {
+  loginfunction1 = async (email, password) => {
     const postData = { email: email, password: password };
     const apiURL = createUser;
 
@@ -100,17 +100,6 @@ class Login extends Component {
     console.log(email, password);
   };
 
-  createTodo = () => {
-    axios
-      .post(createUser, {
-        firtname: "Hello World!",
-        lastname: "This is a new post.",
-        email: "638637fe3bcbd09abf98a1f7",
-        password: ""
-      })
-      .then((response) => console.log("Success: ", response))
-      .catch((error) => console.log("Error: ", error));
-  };
 
   render() {
     const { alert, alertText, alertType } = this.state;
