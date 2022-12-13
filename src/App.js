@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/tabs/Home";
 import Login from "./components/tabs/Login";
+import Test from "./components/tabs/test";
 import Error from "./components/tabs/Error";
 
 

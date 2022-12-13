@@ -32,7 +32,6 @@ import {
 } from "../constants/url";
 import CircularProgress from "@mui/material/CircularProgress";
 import OpenAlert from "../librairy/openAlert";
-import { Delete } from "@mui/icons-material";
 
 class Home extends Component {
   state = {
@@ -42,7 +41,6 @@ class Home extends Component {
     todo: "",
     alert: false,
     load: true,
-    checked: false,
   };
 
   componentDidMount() {
@@ -53,11 +51,6 @@ class Home extends Component {
     e.preventDefault();
     return this.setState({
       [e.target.name]: e.target.value,
-    });
-  };
-  handleChecked = (event) => {
-    return this.setState({
-      checked: event.target,
     });
   };
 
@@ -90,7 +83,6 @@ class Home extends Component {
 
   deleteElement = () => {
     const { data, toDelete } = this.state;
-
     const newData = data.filter((item) => {
       return toDelete.includes(item.id) === false;
     });
@@ -101,58 +93,44 @@ class Home extends Component {
     return this.props.manageData(newData);
   };
 
- 
-
   closeAlert = () => {
     return this.setState({
       alert: false,
-      checked:false
     });
   };
 
-  // checkDelete = async (id) => {
-  //   const { data } = this.state;
+  checkDelete = async (id) => {
+    const { data } = this.state;
 
-  //   this.setState({
-  //     load: true,
-  //   });
-
-  //   if (
-  //     data.find((item) => {
-  //       return item._id === id;
-  //     }) !== undefined
-  //   ) {
-  //     setTimeout(async () => {
-  //       await Axios.delete(base_url + deleteTodo + id)
-  //         .then((res) => {
-  //           console.log(res.data);
-  //           //delete avec succes
-  //           return this.setState({
-  //             toDelete: [...this.state.toDelete, id],
-  //             data: data.filter((item) => item._id !== id),
-  //             load: false,
-  //           });
-  //         })
-  //         .catch((err) => {
-  //           console.log(err);
-  //           // notifier a l'utilisateur que ca a echouer
-  //           this.setState({
-  //             load: false,
-  //           });
-  //         });
-  //     }, 1000);
-  //   }
-  // };
-  checkDelete = (id) => {
-    const { toDelete } = this.state;
-    if (toDelete.includes(id) === true) {
-      return this.setState({
-        toDelete: toDelete.filter((item) => item !== id),
-      });
-    }
-    return this.setState({
-      toDelete: [...toDelete, id],
+    this.setState({
+      load: true,
     });
+
+    if (
+      data.find((item) => {
+        return item._id === id;
+      }) !== undefined
+    ) {
+      setTimeout(async () => {
+        await Axios.delete(base_url + deleteTodo + id)
+          .then((res) => {
+            console.log(res.data);
+            //delete avec succes
+            return this.setState({
+              toDelete: [...this.state.toDelete, id],
+              data: data.filter((item) => item._id !== id),
+              load: false,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            // notifier a l'utilisateur que ca a echouer
+            this.setState({
+              load: false,
+            });
+          });
+      }, 1000);
+    }
   };
 
   createTodo = async () => {
@@ -252,7 +230,7 @@ class Home extends Component {
 
 
   render() {
-    const { title, todo, alert, toDelete, data, load,checked } = this.state;
+    const { title, todo, alert, toDelete, data, load } = this.state;
 
     if (
       !sessionHandler("auth_token", null, "get") ||
@@ -317,7 +295,8 @@ class Home extends Component {
             Remplissez les champs
           </Alert>
         </Snackbar>
-      
+
+
         {/* Main */}
         <Stack
           direction="row"
@@ -341,7 +320,9 @@ class Home extends Component {
                       control={
                         <Checkbox
                           checked={toDelete.includes(item._id)}
-                          onChange={this.handleChecked}
+                          onChange={() => {
+                            this.checkDelete(item._id);
+                          }}
                         />
                       }
                       label={item.title + " : " + item.description}
