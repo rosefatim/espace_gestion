@@ -1,7 +1,6 @@
 const base_url = "http://localhost:9001/";
 
 const createUser = "user/create-user";
-
 const getUser = "user/get-all";
 const getOneUser = "user/get-one/";
 

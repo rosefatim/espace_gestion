@@ -6,7 +6,7 @@ import {
   CardContent,
   Typography,
   Snackbar,
-  Alert
+  Alert,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -34,13 +34,13 @@ class Login extends Component {
     visibility: false,
     alert: false,
     alertText: "Verifier les champs",
-    alertType: "error"
+    alertType: "error",
   };
 
   // functions
   closeAlert = () => {
     return this.setState({
-      alert: false
+      alert: false,
     });
   };
 
@@ -68,38 +68,37 @@ class Login extends Component {
       return this.setState({
         alert: true,
         alertType: "error",
-        alertText: "Email ou Mot de passe incorrect"
+        alertText: "Email ou Mot de passe incorrect",
       });
     }
     await this.props.saveData({
       email: email,
-      password: password
+      password: password,
     });
     await sessionHandler("auth_token", keyCredential, "set");
     this.setState({
       alert: true,
       alertType: "success",
-      alertText: "Vous êtes connecté"
+      alertText: "Vous êtes connecté",
     });
 
     // return this.props.history.push("/home");
   };
 
-  loginfunction1 = async (email, password) => {
-    const postData = { email: email, password: password };
-    const apiURL = createUser;
+  // loginfunction1 = async (email, password) => {
+  //   const postData = { email: email, password: password };
+  //   const apiURL = createUser;
 
-    await axios({
-      method: "post",
-      url: apiURL,
-      data: postData
-    })
-      .then((response) => console.log("Success: ", response))
-      .catch((error) => console.log("Error: ", error));
+  //   await axios({
+  //     method: "post",
+  //     url: apiURL,
+  //     data: postData
+  //   })
+  //     .then((response) => console.log("Success: ", response))
+  //     .catch((error) => console.log("Error: ", error));
 
-    console.log(email, password);
-  };
-
+  //   console.log(email, password);
+  // };
 
   render() {
     const { alert, alertText, alertType } = this.state;
@@ -108,11 +107,17 @@ class Login extends Component {
       sessionHandler("auth_token", null, "get") &&
       sessionHandler("auth_token", null, "get").length !== 0
     ) {
-      return <Navigate to="/home" />;
+      return <Navigate to="/todo" />;
     }
 
     return (
-      <div>
+      <div
+        style={{
+          backgroundColor: "#90C6D3",
+          textAlign: "center",
+          height: "100vh",
+        }}
+      >
         {/* Alert */}
         <Snackbar
           open={alert}
@@ -133,10 +138,11 @@ class Login extends Component {
         <Card
           sx={{
             width: "30%",
-            backgroundColor: "#CECECE",
-            marginLeft: "35%",
+            // backgroundColor: "#CECECE",
+            // marginLeft: "35%",
+            display: "inline-block",
             marginTop: "5%",
-            paddingLeft: 3
+            paddingLeft: 3,
           }}
         >
           <Typography
@@ -150,10 +156,9 @@ class Login extends Component {
           <CardContent>
             <AccountCircle
               style={{
-                color: "blue",
+                color: "#d1d1d1",
                 width: 100,
                 height: 100,
-                marginLeft: "37%"
               }}
             />
             <Stack spacing={2} marginTop={2}>
@@ -215,7 +220,7 @@ const mapDispatchStoreToProps = (dispatch) => {
   return {
     saveData: (data) => {
       dispatch(addUserData(data));
-    }
+    },
   };
 };
 

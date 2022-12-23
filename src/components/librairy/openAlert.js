@@ -10,14 +10,14 @@ const OpenAlert = () => {
   
   const closeAlert = () => {
     return this.setState({
-        open: false
+       open: false
     });
   };
 
   return (
     <div>
       <Snackbar
-        open={open}
+        open={handleClick}
         autoHideDuration={6000}
         onClose={closeAlert}
         message="remplissez les champs"

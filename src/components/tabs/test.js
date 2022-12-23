@@ -16,12 +16,18 @@ export class Test extends Component {
     });
   };
 
-  handleChange = (event) => {
+  // handleChange = (event) => {
+  //   return this.setState({
+  //     checked: event.target,  
+  //   });
+  // };
+
+  handleChecked = (event) => {
     return this.setState({
       checked: event.target,
-      
     });
   };
+  
   deleteElement = () => {
     const { data, toDelete } = this.state;
     const newData = data.filter((item) => {
@@ -40,7 +46,7 @@ export class Test extends Component {
         <FormGroup>
           <FormControlLabel
             control={
-              <Checkbox checked={checked} onChange={this.handleChange} />
+              <Checkbox checked={checked} onChange={this.handleChecked} />
             }
           />
         </FormGroup>
