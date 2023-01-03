@@ -47,7 +47,7 @@ export class Home extends Component {
           variant="h3"
           style={{ textAlign: "center", marginTop: "5%" }}
         >
-          Bienvenu sur MyTodoList
+          Bienvenue sur MyTodoList
         </Typography>
         <div style={{marginLeft:"10%"}}>
           <Typography

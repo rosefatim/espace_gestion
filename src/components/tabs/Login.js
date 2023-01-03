@@ -14,17 +14,14 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import IconButton from "@mui/material/IconButton";
 import { DisplayButton } from "../librairy/button";
 // import { regexVerifier } from "../functions/regex";
-
-import { validatorConnect } from "../functions/validator-connect";
-
-import { keyCredential } from "../constants/credential";
+import { keyCredential, api_key } from "../constants/credential";
 // import { EMAIL_CODE, PASSWORD_CODE } from "../constants/regex-code";
 import { sessionHandler } from "../functions/sessionStore";
 import { connect } from "react-redux";
 import { addUserData } from "../../store/actions";
 import { Navigate } from "react-router-dom";
-import axios from "axios";
-import { createUser, base_url, getUser } from "../constants/url";
+import Axios from "axios";
+import {  base_url,  loginUser } from "../constants/url";
 
 class Login extends Component {
   // states
@@ -64,23 +61,49 @@ class Login extends Component {
     // }
     console.log(email, password);
 
-    if (!validatorConnect(email, password)) {
-      return this.setState({
-        alert: true,
-        alertType: "error",
-        alertText: "Email ou Mot de passe incorrect",
+    await Axios.post(
+      base_url + loginUser,
+      {
+        email: email.toLowerCase().trim(),
+        password,
+      },
+      {
+        headers: {
+          api_key,
+        },
+      }
+    )
+    .then((res) => {
+      console.log("Success: ", res?.data?.message);
+      const data = res.data.data;
+      // console.log(res.data);
+      this.props.saveData({
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        _id: data._id,
       });
-    }
-    await this.props.saveData({
-      email: email,
-      password: password,
+      sessionHandler("auth_token", res.data.auth_token, "set");
+      return setTimeout(async () => {
+        window.location.reload();
+      }, 1000);
+    })
+    .catch((err) => {
+      console.log("Error: ", err?.response?.data?.message);
+      this.setState({
+        load: false,
+      });
     });
-    await sessionHandler("auth_token", keyCredential, "set");
-    this.setState({
-      alert: true,
-      alertType: "success",
-      alertText: "Vous êtes connecté",
-    });
+    // await this.props.saveData({
+    //   email: email,
+    //   password: password,
+    // });
+    // await sessionHandler("auth_token", keyCredential, "set");
+    // this.setState({
+    //   alert: true,
+    //   alertType: "success",
+    //   alertText: "Vous êtes connecté",
+    // });
 
     // return this.props.history.push("/home");
   };

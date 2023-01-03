@@ -1,6 +1,6 @@
 import { LOGIN_USER, LOGOUT_USER, TODO_DATA } from "./action-type";
 
-const initialState = {
+export const initialState = {
   todo: [],
   user: {}
 };

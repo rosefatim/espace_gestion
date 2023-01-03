@@ -15,11 +15,17 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { base_url, createUser } from "../constants/url";
 import Axios from "axios";
+import { sessionHandler } from "../functions/sessionStore";
+import { Navigate } from "react-router-dom";
+import { api_key } from "../constants/credential";
+import { connect } from "react-redux";
+import { addUserData } from "../../store/actions";
+
 
 export class Register extends Component {
   state = {
     data: [],
-    firstsname: "",
+    firstname: "",
     lastname: "",
     email: "",
     password: "",
@@ -45,14 +51,14 @@ export class Register extends Component {
     });
   };
   createUser = async () => {
-    const { firstsname, lastname, email, password, confirm } = this.state;
+    const { firstname, lastname, email, password, confirm } = this.state;
 
     this.setState({
       load: true,
     });
 
     if (
-      firstsname.length === 0 ||
+      firstname.length === 0 ||
       lastname.length === 0 ||
       email.length === 0 ||
       password.length === 0 ||
@@ -74,35 +80,51 @@ export class Register extends Component {
       });
     }
 
-    setTimeout(async () => {
-      console.log(1);
-      await Axios.post(base_url + createUser, {
-        firstsname: firstsname,
-        lastname: lastname,
-        email: email,
-        password: password,
-      })
-        .then((response) => {
-          console.log("Success: ", response?.data?.message);
-          this.setState({
-            load: false,
-            firstsname: "",
-            lastname: "",
-            email: "",
-            password: "",
-          });
-          console.log("ok");
-        })
-        .catch((error) => {
-          console.log("Error: ", error?.response?.data?.message);
-          this.setState({
-            load: false,
-          });
+    console.log(1);
+    await Axios.post(base_url + createUser, {
+      firstname: firstname,
+      lastname: lastname,
+      email: email,
+      password: password,
+    }, 
+    {
+      headers: {
+        api_key,
+      },
+    })
+      .then((res) => {
+        console.log("Success: ", res?.data?.message);
+        const data = res.data.data;
+        // console.log(res.data);
+        this.props.saveData({
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          _id: data._id,
         });
-    }, 1000);
+        sessionHandler("auth_token", res.data.auth_token, "set");
+        return setTimeout(async () => {
+          window.location.reload();
+        }, 1000);
+      })
+      .catch((err) => {
+        console.log("Error: ", err?.response?.data?.message);
+        this.setState({
+          load: false,
+        });
+      });
   };
   render() {
+    if (
+      sessionHandler("auth_token", null, "get") &&
+      sessionHandler("auth_token", null, "get").length !== 0
+    ) {
+      return <Navigate to="/todo" />;
+    }
+
     const { alert, alertText, alertType } = this.state;
+
+
     return (
       <div
         style={{
@@ -157,7 +179,7 @@ export class Register extends Component {
                 label="Nom"
                 name="firstname"
                 variant="outlined"
-                onChange={(e) => this.setState({ firstsname: e.target.value })}
+                onChange={(e) => this.setState({ firstname: e.target.value })}
                 style={{ width: "90%" }}
               />
               <TextField
@@ -229,4 +251,17 @@ export class Register extends Component {
   }
 }
 
-export default Register;
+
+const mapStateToProps = (state) => {
+  return {};
+};
+
+const mapDispatchStoreToProps = (dispatch) => {
+  return {
+    saveData: (data) => {
+      dispatch(addUserData(data));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchStoreToProps)(Register);

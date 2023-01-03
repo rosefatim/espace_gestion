@@ -33,6 +33,7 @@ import {
 } from "../constants/url";
 import OpenAlert from "../librairy/openAlert";
 import { Delete } from "@mui/icons-material";
+import { api_key } from "../constants/credential";
 
 class Todo extends Component {
   state = {
@@ -44,7 +45,6 @@ class Todo extends Component {
     alertType: "",
     alertText: "",
     load: true,
-    checked: false,
   };
 
   componentDidMount() {
@@ -55,12 +55,6 @@ class Todo extends Component {
     a.preventDefault();
     return this.setState({
       [a.target.name]: a.target.value,
-    });
-  };
-
-  handleChecked = (event) => {
-    return this.setState({
-      checked: event.target,
     });
   };
 
@@ -109,49 +103,39 @@ class Todo extends Component {
     });
   };
 
-  // checkDelete = async (id) => {
-  //   const { data } = this.state;
+  // checkDelete = (id) => {
+  //     const { toDelete} = this.state;
+  //     if (toDelete.includes(id) === true) {
+  //       return this.setState({
+  //         toDelete: toDelete.filter((item) => item !== id),
+  //       });
+  //     }
+  //     return this.setState({
+  //       toDelete: [...toDelete, id],
+  //     });
+  //   };
 
-  //   this.setState({
-  //     load: true,
-  //   });
-
-  //   if (
-  //     data.find((item) => {
-  //       return item._id === id;
-  //     }) !== undefined
-  //   ) {
-  //     setTimeout(async () => {
-  //       await Axios.delete(base_url + deleteTodo + id)
-  //         .then((res) => {
-  //           console.log(res.data);
-  //           //delete avec succes
-  //           return this.setState({
-  //             toDelete: [...this.state.toDelete, id],
-  //             data: data.filter((item) => item._id !== id),
-  //             load: false,
-  //           });
-  //         })
-  //         .catch((err) => {
-  //           console.log(err);
-  //           // notifier a l'utilisateur que ca a echouer
-  //           this.setState({
-  //             load: false,
-  //           });
-  //         });
-  //     }, 1000);
-  //   }
-  // };
-  checkDelete = (id) => {
-    const { toDelete } = this.state;
-    if (toDelete.includes(id) === true) {
-      return this.setState({
-        toDelete: toDelete.filter((item) => item !== id),
+  getAllTodos = async () => {
+    await Axios.get(base_url + getAllTodo + "/" + this.props.user._id, {
+      headers: {
+        api_key,
+        authorization: sessionHandler("auth_token", null, "get"),
+      },
+    })
+      .then((res) => {
+        console.log(res?.data);
+        this.setState({
+          load: false,
+          data: res?.data?.data,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        //notification d'erreur
+        this.setState({
+          load: false,
+        });
       });
-    }
-    return this.setState({
-      toDelete: [...toDelete, id],
-    });
   };
 
   createTodo = async () => {
@@ -170,11 +154,20 @@ class Todo extends Component {
       });
     }
     setTimeout(async () => {
-      await Axios.post(base_url + createTodo, {
-        title: title,
-        description: todo,
-        user_id: "638a0cabc5f19d417e80bd06",
-      })
+      await Axios.post(
+        base_url + createTodo,
+        {
+          title: title,
+          description: todo,
+          user_id: this.props.user._id, //recup id de l'utilisateur connecté
+        },
+        {
+          headers: {
+            api_key,
+            authorization: sessionHandler("auth_token", null, "get"),
+          },
+        }
+      )
         .then((response) => {
           console.log("Success: ", response?.data?.message);
           this.setState({
@@ -193,24 +186,6 @@ class Todo extends Component {
     }, 1000);
   };
 
-  getAllTodos = async () => {
-    await Axios.get(base_url + getAllTodo)
-      .then((res) => {
-        console.log(res?.data);
-        this.setState({
-          load: false,
-          data: res?.data?.data,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        //notification d'erreur
-        this.setState({
-          load: false,
-        });
-      });
-  };
-
   updateTodo = async (id) => {
     const { title, todo } = this.state;
 
@@ -218,26 +193,26 @@ class Todo extends Component {
       load: true,
     });
 
-    if (title.length === 0 || todo.length === 0) {
-      return this.setState({
-        load: false,
-        alert: true,
-        alertType: "error",
-        alertText: "Remplissez les champs svp!",
-      });
-    }
     setTimeout(async () => {
-      await Axios.post(base_url + updateTodo + id, {
-        title: title,
-        description: todo,
-        user_id: "638637fe3bcbd09abf98a1f7",
-      })
+      await Axios.put(
+        base_url + updateTodo + id,
+        {
+          achieved: true,
+        },
+        {
+          headers: {
+            api_key,
+            authorization: sessionHandler("auth_token", null, "get"),
+          },
+        }
+      )
         .then((response) => {
           console.log("Success: ", response?.data?.message);
-          this.setState({
-            load: false,
-            data: [response?.data?.data, ...this.state.data],
-          });
+          // this.setState({
+          //   load: false,
+          //   data: [response?.data?.data, ...this.state.data],
+          // });
+          return window.location.reload();
         })
         .catch((error) => {
           console.log("Error: ", error?.response?.data?.message);
@@ -249,19 +224,58 @@ class Todo extends Component {
     }, 1000);
   };
 
-  render() {
-    const {
-      title,
-      todo,
-      alert,
-      alertText,
-      alertType,
-      toDelete,
-      data,
-      load,
-      checked,
-    } = this.state;
+  update = async () => {
+    this.setState({
+      load: true,
+    });
+  };
 
+  checkDelete = async (id) => {
+    const { data } = this.state;
+
+    this.setState({
+      load: true,
+    });
+
+    if (
+      data.find((item) => {
+        return item._id === id;
+      }) !== undefined
+    ) {
+      setTimeout(async () => {
+        await Axios.delete(base_url + deleteTodo + id)
+          .then(
+            (res) => {
+              console.log(res.data);
+              //delete avec succes
+              return this.setState({
+                toDelete: [...this.state.toDelete, id],
+                data: data.filter((item) => item._id !== id),
+                load: false,
+              });
+            },
+            {
+              headers: {
+                api_key,
+                authorization: sessionHandler("auth_token", null, "get"),
+              },
+            }
+          )
+          .catch((err) => {
+            console.log(err);
+            // notifier a l'utilisateur que ca a echouer
+            this.setState({
+              load: false,
+            });
+          });
+      }, 1000);
+    }
+  };
+
+  render() {
+    const { title, todo, alert, alertText, alertType, toDelete, data, load } =
+      this.state;
+    const { user } = this.props;
     if (
       !sessionHandler("auth_token", null, "get") ||
       sessionHandler("auth_token", null, "get").length === 0
@@ -281,6 +295,10 @@ class Todo extends Component {
               <Typography component="div" sx={{ flexGrow: 1 }}>
                 LOGO
               </Typography>
+              <Typography component="div" sx={{ flexGrow: 1 }}>
+                Bienvenue {user.lastname}
+              </Typography>
+
               <Stack direction="row " justifyContent="space-evently">
                 <DisplayLink
                   to="error"
@@ -346,8 +364,10 @@ class Todo extends Component {
                         value="end"
                         control={
                           <Checkbox
-                            checked={checked}
-                            onChange={this.handleChecked}
+                            checked={toDelete.includes(item._id)}
+                            onChange={() => {
+                              this.updateTodo(item._id);
+                            }}
                           />
                         }
                         label={item.title + " : " + item.description}
@@ -368,12 +388,13 @@ class Todo extends Component {
                   .map((item) => (
                     <FormGroup key={item._id}>
                       <FormControlLabel
-                        value="start"
+                        value="end"
                         control={
                           <Checkbox
-                            color="success"
-                            defaultChecked
-                            onChange={this.handleChecked}
+                            checked={toDelete.includes(item._id)}
+                            onChange={() => {
+                              this.checkDelete(item._id);
+                            }}
                           />
                         }
                         label={item.title + " : " + item.description}
@@ -410,7 +431,7 @@ class Todo extends Component {
                 <CircularProgress />
               </Box>
             ) : (
-              <Stack direction="row" spacing={2} style={{ marginLeft: "10%" }}>
+              <Stack direction="row" spacing={2} style={{ marginLeft: "20%" }}>
                 <DisplayButton
                   type="contained"
                   text="Add"
@@ -428,25 +449,14 @@ class Todo extends Component {
                   startIcon={<DeleteIcon />}
                   style={{ height: 50 }}
                   onPress={() => {
-                    this.deleteElement();
-                  }}
-                />
-                <DisplayButton
-                  type="contained"
-                  text="Edit"
-                  color="success"
-                  startIcon={<EditIcon />}
-                  style={{ height: 50 }}
-                  onPress={() => {
-                    this.updateTodo();
+                    this.checkDelete();
                   }}
                 />
               </Stack>
             )}
           </Box>
         </Stack>
-
-        {/* {JSON.stringify(this.state.data)}  */}
+        {/*  {JSON.stringify(this.state.data)}  */}
         {/* Footer */}
       </div>
     );
